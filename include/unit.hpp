@@ -37,6 +37,7 @@ public:
         return *this;
     }
 
+    // Conversion operator to another unit type
     template <typename RatioB, int ExpB, typename DimB,
              typename = detail::void_t<
                  std::enable_if_t<
@@ -50,6 +51,18 @@ public:
                 (double)DiffRatio::num / DiffRatio::den;
             
         return ReturnType{ratio * value_};
+    }
+
+    // Conversion operator to double
+    template <typename U = Dim>
+    operator typename std::enable_if<
+        std::is_same<U, detail::si_scalar>::value, double>::type () const {
+        using DiffRatio = std::ratio_divide<Ratio, std::ratio<1, 1>>;
+        constexpr int diff_exp = Exp - 0;
+        constexpr double ratio = 
+                detail::pow(10, diff_exp) *
+                (double)DiffRatio::num / DiffRatio::den;
+        return ratio * value_;
     }
 
     unit operator + (const unit& other) const {
@@ -135,6 +148,55 @@ public:
     unit operator / (double k) const {
         return unit{value_ / k};
     }
+
+    bool operator == (const unit& other) const {
+        return value_ == other.value_;
+    }
+
+    bool operator == (unit&& other) const {
+        return value_ == other.value_;
+    }
+
+    bool operator != (const unit& other) const {
+        return value_ != other.value_;
+    }
+
+    bool operator != (unit&& other) const {
+        return value_ != other.value_;
+    }
+
+    bool operator < (const unit& other) const {
+        return value_ < other.value_;
+    }
+
+    bool operator < (unit&& other) const {
+        return value_ < other.value_;
+    }
+
+    bool operator > (const unit& other) const {
+        return value_ > other.value_;
+    }
+
+    bool operator > (unit&& other) const {
+        return value_ > other.value_;
+    }
+
+    bool operator <= (const unit& other) const {
+        return value_ <= other.value_;
+    }
+
+    bool operator <= (unit&& other) const {
+        return false <= other.value_;
+    }
+
+    bool operator >= (const unit& other) const {
+        return value_ >= other.value_;
+    }
+
+    bool operator >= (unit&& other) const {
+        return value_ >= other.value_;
+    }
+
 };
 
 template <typename Ratio, int Exp, typename Dim>
@@ -160,6 +222,9 @@ using velocity = detail::dimension_div_t<
         detail::si_length, detail::si_time>;
 using metres_per_second = unit<std::ratio<1>, 0, velocity>;
 using kilometres_per_hour = unit<std::ratio<10, 36>, 0, velocity>;
+
+// Scalar
+using scalar = unit<std::ratio<1, 1>, 0, detail::si_scalar>;
 
 } // namespace measurement
 

@@ -23,6 +23,9 @@ using si_temperature = number_sequence<0, 0, 0, 0, 1, 0, 0>;
 using si_mole = number_sequence<0, 0, 0, 0, 0, 1, 0>;
 using si_candela = number_sequence<0, 0, 0, 0, 0, 0, 1>;
 
+// Representing scalars
+using si_scalar = number_sequence<0, 0, 0, 0, 0, 0, 0>;
+
 
 template <typename Sequence, typename = void>
 struct size_of {};

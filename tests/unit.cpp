@@ -21,6 +21,9 @@ TEST(unit, definitions) {
         unit<std::ratio<1, 1>, 0, velocity>>();
     assert_same<kilometres_per_hour, 
         unit<std::ratio<10, 36>, 0, velocity>>();
+
+    assert_same<scalar,
+        unit<std::ratio<1, 1>, 0, detail::si_scalar>>();
 }
 
 TEST(unit, constructor) {
@@ -65,6 +68,16 @@ TEST(unit, conversion) {
 TEST(unit, conversion_velocity) {
     kilometres_per_hour v = metres_per_second{3};
     ASSERT_DOUBLE_EQ(v(), 3 * 3.6);
+}
+
+TEST(unit, conversion_to_double_when_no_dimension) {
+    kilometres value1{1};
+    metres value2{100};
+    ASSERT_DOUBLE_EQ(value1 / value2, 10);
+
+    hours h{1};
+    seconds s{10};
+    ASSERT_DOUBLE_EQ(h / s, 3600 / 10);
 }
 
 TEST(unit, add) {
@@ -195,4 +208,59 @@ TEST(unit, divide_with_scalar) {
 
     kilometres_per_hour v1 = v;
     ASSERT_DOUBLE_EQ(v1(), 5 * 3.6);
+}
+
+TEST(unit, equal) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5 * 3.6};
+    kilometres_per_hour v3{5.001 * 3.6};
+    ASSERT_TRUE(v1 == v2);
+    ASSERT_FALSE(v1 == v3);
+}
+
+TEST(unit, not_equal) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5 * 3.6};
+    kilometres_per_hour v3{5.001 * 3.6};
+    ASSERT_FALSE(v1 != v2);
+    ASSERT_TRUE(v1 != v3);
+}
+
+TEST(unit, less_than) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5.001 * 3.6};
+    
+    ASSERT_TRUE(v1 < v2);
+    ASSERT_TRUE(kilometres_per_hour{4.999 * 3.6} < v1);
+}
+
+TEST(unit, greater_than) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5.001 * 3.6};
+
+    ASSERT_TRUE(v2 > v1);
+    ASSERT_TRUE(v1 > kilometres_per_hour{4.999 * 3.6});
+}
+
+TEST(unit, less_than_or_equal) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5 * 3.6};
+    kilometres_per_hour v3{5.001 * 3.6};
+
+    ASSERT_FALSE(v1 < v2);
+    ASSERT_TRUE(v1 <= v2);
+    ASSERT_TRUE(v2 <= v3);
+    ASSERT_TRUE(v3 <= v3);
+}
+
+TEST(unit, greater_than_or_equal) {
+    metres_per_second v1{5};
+    kilometres_per_hour v2{5 * 3.6};
+    kilometres_per_hour v3{5.001 * 3.6};
+
+    ASSERT_FALSE(v1 > v2);
+    ASSERT_TRUE(v2 >= v1);
+    ASSERT_TRUE(v3 >= v2);
+    ASSERT_TRUE(v3 >= v3);
+    ASSERT_FALSE(v1 >= v3);
 }
